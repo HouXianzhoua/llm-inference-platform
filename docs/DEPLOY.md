@@ -1,12 +1,11 @@
-```markdown
 # 🚀 部署指南
 
 本文档介绍如何在本地环境（WSL2 + NVIDIA GPU）上部署基于 Text Generation Inference (TGI) 的大语言模型推理服务，支持 GPTQ 量化模型的高效运行。
 
-当前已验证支持模型：
+**当前已验证支持模型：**
 - `Qwen/Qwen2-7B-Instruct-GPTQ-Int4`
 
-后续将扩展支持：
+**后续将扩展支持：**
 - `hugging-quants/Meta-Llama-3.1-8B-Instruct-GPTQ-INT4`
 
 ---
@@ -36,13 +35,6 @@ mkdir -p models
 # 下载 Qwen2-7B-Instruct-GPTQ-Int4
 git lfs install
 git clone https://huggingface.co/Qwen/Qwen2-7B-Instruct-GPTQ-Int4 models/Qwen2-7B-Instruct-GPTQ-Int4
-```
-
-> 💡 提示：若下载缓慢，可考虑使用国内镜像（如阿里云魔搭）：
-> ```bash
-> git clone https://modelscope.cn/qwen/Qwen2-7B-Instruct-GPTQ-Int4.git models/Qwen2-7B-Instruct-GPTQ-Int4
-> ```
-
 ---
 
 ## ▶️ 2. 启动 TGI 推理服务
