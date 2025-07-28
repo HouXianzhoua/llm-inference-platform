@@ -9,6 +9,7 @@ docker run --rm \
   ghcr.io/huggingface/text-generation-inference:latest \
   --model-id /data \
   --quantize gptq \
-  --max-input-length 2048 \
-  --max-total-tokens 4096 \
+  --max-input-length 1024 \
+  --max-total-tokens 2048 \
+  --cuda-memory-fraction 0.6 \
   --trust-remote-code
