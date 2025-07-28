@@ -39,7 +39,7 @@ command:
   - --trust-remote-code
   - --quantize=gptq：启用 GPTQ 解码器感知量化
   - --trust-remote-code：允许加载自定义模型代码（Qwen/Llama3 所需）
-
+```
 ## 注意事项
 首次加载较慢：INT4 模型需在 GPU 上进行反量化，首次推理延迟略高。
 精度微损：INT4 量化可能导致极轻微的生成质量下降，但在大多数场景下不可察觉。
