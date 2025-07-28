@@ -1,22 +1,28 @@
 # scripts/test_api.py
 import requests
+import json
 
-def test_model(url, prompt, model_name):
-    resp = requests.post(
-        f"{url}/generate",
-        json={
-            "inputs": prompt,
-            "parameters": {"max_new_tokens": 128}
-        }
-    )
-    print(f"[{model_name}] Status: {resp.status_code}")
-    if resp.status_code == 200:
-        print(f"Response: {resp.json()['generated_text']}\n")
-    else:
-        print(f"Error: {resp.text}\n")
+def test_model(prompt: str, model_id: str = "qwen2", max_tokens: int = 128):
+    url = "http://localhost:8000/v1/generate"
+    data = {
+        "model_id": model_id,
+        "inputs": prompt,
+        "parameters": {"max_new_tokens": max_tokens}
+    }
 
-# 测试 Qwen2
-test_model("http://localhost:8080", "请用中文写一首关于秋天的诗", "Qwen2")
+    print(f"\n🚀 Testing [{model_id.upper()}] '{prompt}'")
+    try:
+        resp = requests.post(url, json=data)
+        print(f"HTTP {resp.status_code}")
+        if resp.status_code == 200:
+            result = resp.json()
+            print(f"✅ Generated: {result['generated_text'][:200]}...")
+        else:
+            print(f"❌ Error: {resp.text}")
+    except Exception as e:
+        print(f"💥 Exception: {e}")
 
-# 测试 Llama3
-test_model("http://localhost:8081", "Write a poem about autumn in English", "Llama3")
+# --- 测试用例 ---
+test_model("请用中文写一首关于秋天的诗", "qwen2")
+test_model("Write a poem about autumn in English", "llama3")
+test_model("Hello?", "bloom")  # 应报错

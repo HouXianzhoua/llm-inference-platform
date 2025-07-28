@@ -1,19 +1,18 @@
 # docker-compose.yml
-version: '3.8'
-
 services:
   tgi-qwen2:
     image: ghcr.io/huggingface/text-generation-inference:latest
     runtime: nvidia
-    ports:
-      - "8080:80"
+    expose:
+      - "80"
     volumes:
       - ./models/Qwen2-7B-Instruct-GPTQ-Int4:/data
     command:
       - --model-id=/data
       - --quantize=gptq
-      - --max-input-length=2048
-      - --max-total-tokens=4096
+      - --max-input-length=1024
+      - --max-total-tokens=2048
+      - --cuda-memory-fraction=0.6
       - --trust-remote-code
     shm_size: 1g
     deploy:
@@ -27,8 +26,8 @@ services:
   tgi-llama3:
     image: ghcr.io/huggingface/text-generation-inference:latest
     runtime: nvidia
-    ports:
-      - "8081:80"
+    expose:
+      - "80"
     volumes:
       - ./models/Meta-Llama-3.1-8B-Instruct-GPTQ-INT4:/data
     command:
@@ -45,3 +44,15 @@ services:
             - driver: nvidia
               device_ids: ['0']
               capabilities: [gpu]
+
+  gateway:
+    build: 
+      context: .
+      dockerfile: gateway/Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - tgi-qwen2
+      - tgi-llama3
+    # 修改 endpoint 为服务名（docker 内部通信）
+    # 注意：config.py 中的 endpoint 要改为服务名！
