@@ -16,19 +16,32 @@ services:
       - --max-total-tokens=4096
       - --trust-remote-code
     shm_size: 1g
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0']
+              capabilities: [gpu]
 
-  # 后续可扩展：llama3 模型
-  # tgi-llama3:
-  #   image: ghcr.io/huggingface/text-generation-inference:latest
-  #   runtime: nvidia
-  #   ports:
-  #     - "8081:80"
-  #   volumes:
-  #     - ./models/Meta-Llama-3.1-8B-Instruct-GPTQ-INT4:/data
-  #   command:
-  #     - --model-id=/data
-  #     - --quantize=gptq
-  #     - --max-input-length=2048
-  #     - --max-total-tokens=4096
-  #     - --trust-remote-code
-    # shm_size: 1g
+  tgi-llama3:
+    image: ghcr.io/huggingface/text-generation-inference:latest
+    runtime: nvidia
+    ports:
+      - "8081:80"
+    volumes:
+      - ./models/Meta-Llama-3.1-8B-Instruct-GPTQ-INT4:/data
+    command:
+      - --model-id=/data
+      - --quantize=gptq
+      - --max-input-length=2048
+      - --max-total-tokens=4096
+      - --trust-remote-code
+    shm_size: 1g
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0']
+              capabilities: [gpu]
