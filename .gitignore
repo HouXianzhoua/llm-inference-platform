@@ -1,0 +1,114 @@
+# ========================
+# 📁 项目通用忽略
+# ========================
+# 临时文件
+*~
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# 日志文件
+*.log
+logs/
+log/
+
+# 环境变量文件（敏感信息）
+.env
+.env.local
+.env.development
+.env.production
+
+# 依赖管理
+requirements.txt.local
+poetry.lock
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# 构建输出
+dist/
+build/
+out/
+output/
+*.egg-info/
+
+# Python 编译文件
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# 虚拟环境
+venv/
+env/
+ENV/
+.venv/
+.env/
+
+# IDE 和编辑器
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+
+# Docker
+.dockerignore
+!docker-compose.yml
+
+# 本地测试数据
+data/
+tmp/
+temp/
+
+
+# ========================
+# 🤖 大模型相关（重点！）
+# ========================
+# 忽略所有 models/ 下的内容，除了 MODEL_LIST.md
+/models/*
+!/models/MODEL_LIST.md
+
+# 额外保险：忽略常见模型文件
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.ckpt
+*.gguf
+*.msgpack
+
+# Hugging Face 缓存
+~/.cache/huggingface/
+./.cache/huggingface/
+transformers_cache/
+models_cache/
+
+# LFS 大文件占位符（如果你用 git lfs 管理部分小模型，可选）
+*.lfs.*
+
+
+# ========================
+# 📊 监控系统（InfluxDB/Grafana 数据）
+# ========================
+/monitoring/grafana/data/
+/monitoring/grafana/logs/
+/monitoring/influxdb/
+
+# StatsD 一般只保留配置
+/monitoring/statsd/data/
+/monitoring/statsd/log/
+
+
+# ========================
+# 🐳 Docker Compose 临时数据
+# ========================
+# Docker volumes 挂载的数据目录（如果未来添加）
+volumes/
+/shared/
+
+# TGI 或其他服务的临时目录
+/shm/
