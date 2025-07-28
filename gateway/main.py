@@ -25,13 +25,31 @@ app.add_middleware(
 class GenerateRequest(BaseModel):
     model_id: str = "qwen2"
     inputs: str
-    parameters: dict = {}
+    parameters: dict = {
+        "max_new_tokens": 128,
+        "temperature": 0.7,
+        "top_p": 0.9,
+        "do_sample": True,
+        "stop": []  # 允许用户自定义 stop
+    }
 
 class GenerateResponse(BaseModel):
     generated_text: str
     model: str
     tokens: int = None
 
+@app.get("/v1/models")
+async def list_models():
+    return {
+        "models": [
+            {
+                "id": k,
+                "name": v["name"],
+                "supports": ["completion", "instruct"]
+            }
+            for k, v in MODEL_REGISTRY.items()
+        ]
+    }
 
 @app.get("/health")
 async def health():
@@ -58,21 +76,30 @@ async def generate(request: GenerateRequest):
     # === 注入 Prompt 模板 ===
     try:
         formatted_prompt = model_config["prompt_template"].format(input=prompt)
+    except KeyError as e:
+        raise HTTPException(500, f"Prompt template error: missing key {e}")
     except Exception as e:
         raise HTTPException(500, f"Failed to format prompt: {str(e)}")
-
-    # === 设置 stop tokens（TGI 支持 stop 参数）===
-    if "stop" in model_config:
-        if "stop" in parameters:
-            parameters["stop"] = parameters["stop"] + model_config["stop"]
+    # 合并 stop tokens
+    final_stop = set(model_config.get("stop", []))  # 来自 config.py 的默认 stop
+    if "stop" in parameters:
+        final_stop.update(parameters["stop"])       # 用户传入的 stop
+    if final_stop:
+        parameters["stop"] = list(final_stop)       # 写回 parameters
+    # === 注入 stop_token_ids ===
+    if "stop_token_ids" in model_config:
+        if "stop_token_ids" in parameters:
+            # 合并用户传入的 stop_token_ids
+            parameters["stop_token_ids"] = list(
+                set(parameters["stop_token_ids"]) | set(model_config["stop_token_ids"])
+            )
         else:
-            parameters["stop"] = model_config["stop"]
-
-    # 构造转发给 TGI 的 payload
+            parameters["stop_token_ids"] = model_config["stop_token_ids"]
+    # 构造 TGI 请求体
     tgi_payload = {
         "inputs": formatted_prompt,
-        "parameters": parameters
-    }
+        "parameters": parameters  # 完整透传
+    } 
 
     logger.info(f"[{model_id}] Forwarding to {model_config['endpoint']}")
     logger.debug(f"Prompt: {formatted_prompt}")
@@ -89,7 +116,8 @@ async def generate(request: GenerateRequest):
             return {
                 "generated_text": generated_text,
                 "model": model_config["name"],
-                "tokens": len(generated_text.split())  # 简单估算
+                "tokens": len(generated_text.split()),  # 简单估算，也可用 tokenizer
+                "model_id": model_id
             }
         except httpx.TimeoutException:
             raise HTTPException(504, "Model inference timeout")
