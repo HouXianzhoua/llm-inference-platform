@@ -7,5 +7,5 @@ COPY gateway/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY gateway .
-
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+COPY scripts /app/scripts
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "--port", "8000"]

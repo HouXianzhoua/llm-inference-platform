@@ -1,4 +1,5 @@
 # gateway/config.py
+from templates import TEMPLATES
 MODEL_REGISTRY = {
     "qwen2": {
         "name": "Qwen2-7B-Instruct-GPTQ-Int4",

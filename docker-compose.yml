@@ -51,6 +51,8 @@ services:
       dockerfile: gateway/Dockerfile
     ports:
       - "8000:8000"
+    volumes:
+      - ./gateway:/app/gateway
     depends_on:
       - tgi-qwen2
       - tgi-llama3
