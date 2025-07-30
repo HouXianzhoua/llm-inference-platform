@@ -100,5 +100,4 @@ command:
 - [部署指南](DEPLOY.md)
 - [统一 API 文档](API.md)
 - [性能测试方法](PERFORMANCE_TEST.md)
-- [项目主页](README.md)
-
+- [项目主页](../README.md)

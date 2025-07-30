@@ -262,4 +262,4 @@ nvidia-smi
 - [统一 API 文档](API.md)
 - [GPTQ 量化原理](QUANTIZATION.md)
 - [性能测试指南](PERFORMANCE_TEST.md)
-- [项目主页](README.md)
+- [项目主页](../README.md)

@@ -232,4 +232,4 @@ curl http://localhost:8000/v1/generate -X POST \
 - [部署指南](DEPLOY.md)
 - [量化原理](QUANTIZATION.md)
 - [性能测试](PERFORMANCE_TEST.md)
-- [项目主页](README.md)
+- [项目主页](../README.md)
