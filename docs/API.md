@@ -1,6 +1,3 @@
----
-
-```markdown
 # 📡 统一推理 API 文档
 
 > 本平台提供统一的 RESTful API 接口，支持多模型路由、动态参数控制与多场景生成任务。
@@ -236,6 +233,3 @@ curl http://localhost:8000/v1/generate -X POST \
 - [量化原理](QUANTIZATION.md)
 - [性能测试](PERFORMANCE_TEST.md)
 - [项目主页](README.md)
-```
-
----

@@ -1,6 +1,3 @@
-
-
-```markdown
 # 🚀 部署指南
 
 > 本项目基于 **Text Generation Inference (TGI)** 与 **GPTQ-INT4 量化技术**，构建支持 `Qwen2-7B` 与 `Llama-3.1-8B` 双模型的本地化大语言模型推理平台。通过 FastAPI 统一网关路由请求，并集成完整监控体系。
@@ -266,4 +263,3 @@ nvidia-smi
 - [GPTQ 量化原理](QUANTIZATION.md)
 - [性能测试指南](PERFORMANCE_TEST.md)
 - [项目主页](README.md)
-```

@@ -1,4 +1,3 @@
-```markdown
 # 🧮 GPTQ INT4 量化说明
 
 > 本项目采用 **GPTQ（General-Purpose Quantization）** 技术对大语言模型进行 **INT4 低比特量化**，显著降低显存占用，提升推理效率，使其能够在消费级 GPU（如 RTX 4070 Super 12GB）上高效部署。
@@ -102,4 +101,4 @@ command:
 - [统一 API 文档](API.md)
 - [性能测试方法](PERFORMANCE_TEST.md)
 - [项目主页](README.md)
-```
+

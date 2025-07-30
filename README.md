@@ -1,6 +1,3 @@
----
-
-```markdown
 # 🚀 高并发多模型大语言模型推理服务平台
 
 > 基于 Text Generation Inference (TGI) 与 GPTQ 量化技术构建的本地化、可扩展、高性能 LLM 推理平台，支持多模型热加载、统一 API 路由与完整监控体系。
@@ -229,4 +226,3 @@ FastAPI → StatsD → InfluxDB → Grafana
 ---
 
 > 🔭 项目持续更新中，欢迎 Star ⭐ & Fork 🍴！
-```
