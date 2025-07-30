@@ -10,6 +10,7 @@ from config import MODEL_REGISTRY
 import uuid
 import time
 from fastapi import Request
+import json
 
 # 初始化 StatsD 客户端（使用 docker-compose 中的 statsd-exporter 服务名）
 stats_client = statsd.StatsClient('statsd-exporter', 9125)  # 注意：在容器内使用服务名
@@ -32,12 +33,13 @@ app.add_middleware(
 class GenerateRequest(BaseModel):
     model_id: str = "qwen2"
     inputs: str
+    scenario: str = "base"  # 新增：支持 qa / summarize / rewrite / base
     parameters: dict = {
         "max_new_tokens": 128,
         "temperature": 0.7,
         "top_p": 0.9,
         "do_sample": True,
-        "stop": []  # 允许用户自定义 stop
+        "stop": []
     }
 
 class GenerateResponse(BaseModel):
@@ -122,11 +124,19 @@ async def generate(request: GenerateRequest):
     prompt = request.inputs
     parameters = request.parameters.copy()
 
-    # === 注入 Prompt 模板 ===
+    # === 选择模板 ===
+    templates = model_config["prompt_templates"]
+    template_key = request.scenario
+    if template_key not in templates:
+        logger.warning(f"[{request_id}] Invalid scenario '{template_key}', using default")
+        template_key = model_config.get("default_template", "base")
+    
     try:
-        formatted_prompt = model_config["prompt_template"].format(input=prompt)
+        template = templates[template_key]
+        formatted_prompt = template.format(input=prompt)
+        logger.info(f"[{request_id}] Using template: {template_key}")
     except Exception as e:
-        error_msg = f"Failed to format prompt for {model_id}: {str(e)}"
+        error_msg = f"Failed to format prompt for {model_id} with template '{template_key}': {str(e)}"
         logger.error(f"[{request_id}] Template error: {e}")
         raise HTTPException(
             status_code=500,
