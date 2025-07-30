@@ -1,0 +1,86 @@
+# monitoring/docker-compose.monitor.yml
+
+networks:
+  app-network:
+    external: true
+    name: app-network
+
+services:
+  influxdb:
+    image: influxdb:2.7
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=llm
+      - DOCKER_INFLUXDB_INIT_PASSWORD=llm12345678
+      - DOCKER_INFLUXDB_INIT_ORG=llm-org
+      - DOCKER_INFLUXDB_INIT_BUCKET=llm-metrics
+    ports:
+      - "8086:8086"
+    volumes:
+      - ./influxdb:/var/lib/influxdb2
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  statsd-exporter:
+    image: prom/statsd-exporter:v0.25.0
+    ports:
+      - "9125:9125/udp"   # StatsD 接收端口
+      - "9102:9102"       # Prometheus 拉取指标端口
+    command:
+      - --statsd.mapping-config=/etc/statsd-mapping.conf
+      - --log.level=info
+    volumes:
+      - ./statsd/statsd-mapping.yaml:/etc/statsd-mapping.conf
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  grafana:
+    image: grafana/grafana:10.4.0
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=grafana
+      - GF_FEATURE_TOGGLES_ENABLE=ngalert
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/datasources.yaml:/etc/grafana/provisioning/datasources/datasource.yml
+    depends_on:
+      - influxdb
+    restart: unless-stopped
+    networks:
+      - app-network
+  
+  telegraf:
+    image: telegraf:1.28
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    volumes:
+      - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    depends_on:
+      - statsd-exporter
+      - influxdb
+    networks:
+      - app-network 
+
+  gpu-monitor:
+    build:
+      context: ..
+      dockerfile: monitoring/gpu-monitor.Dockerfile
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0']
+              capabilities: [gpu]
+    depends_on:
+      - statsd-exporter
+    networks:
+      - app-network

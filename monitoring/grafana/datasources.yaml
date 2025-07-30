@@ -1,0 +1,16 @@
+# monitoring/grafana/datasources.yaml
+apiVersion: 1
+datasources:
+  - name: InfluxDB
+    type: influxdb
+    uid: influxdb  
+    url: http://influxdb:8086
+    access: proxy
+    basicAuth: false
+    isDefault: true
+    jsonData:
+      version: Flux
+      organization: llm-org
+      defaultBucket: llm-metrics
+    secureJsonData:
+      token: bkuQoD0occsHQjSMOgh8aEODjpLxde5TSqDw67EXRb5d0G7M6AYOiVBBypj17N4vlJDREG-9YxvQcReCMIlnUw==

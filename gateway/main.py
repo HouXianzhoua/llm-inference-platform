@@ -2,6 +2,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+import statsd
 import httpx
 import logging
 from model_manager import manager
@@ -9,6 +10,9 @@ from config import MODEL_REGISTRY
 import uuid
 import time
 from fastapi import Request
+
+# 初始化 StatsD 客户端（使用 docker-compose 中的 statsd-exporter 服务名）
+stats_client = statsd.StatsClient('statsd-exporter', 9125)  # 注意：在容器内使用服务名
 
 # 设置日志
 logging.basicConfig(level=logging.INFO)
@@ -96,7 +100,12 @@ async def generate(request: GenerateRequest):
 
     # === 日志：请求开始 ===
     logger.info(f"[{request_id}] Received | model={model_id} | input_len={len(request.inputs.split())} tokens")
-
+    # 在请求开始时
+    stats_client.incr('requests.total')                    # 总请求数
+    stats_client.incr(f'requests.model.{model_id}')       # 按模型统计
+    stats_client.incr(f'requests.model.{model_id}.input_tokens', len(request.inputs.split()))
+    ts = int(time.time())
+    stats_client.incr(f'requests.debug.ts.{ts}')
     if model_id not in MODEL_REGISTRY:
         error_msg = f"Model not supported: {model_id}"
         logger.warning(f"[{request_id}] Reject: {error_msg}")
@@ -158,13 +167,15 @@ async def generate(request: GenerateRequest):
 
             latency = time.time() - start_time
             output_tokens = len(generated_text.split())
-
+           
             # === 日志：成功响应 ===
             logger.info(
                 f"[{request_id}] Success | model={model_id} | "
                 f"output_tokens={output_tokens} | latency={latency:.2f}s"
             )
-
+            # 在成功返回时
+            stats_client.timing('request.latency', int(latency * 1000))  # 毫秒
+            stats_client.incr(f'requests.model.{model_id}.output_tokens', output_tokens)
             return {
                 "generated_text": generated_text,
                 "model": model_config["name"],
@@ -172,6 +183,8 @@ async def generate(request: GenerateRequest):
             }
 
         except httpx.TimeoutException as e:
+            stats_client.incr('requests.errors.timeout')
+            stats_client.incr(f'requests.errors.model.{model_id}')
             latency = time.time() - start_time
             logger.error(f"[{request_id}] Timeout | model={model_id} | latency={latency:.2f}s")
             raise HTTPException(

@@ -1,0 +1,75 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Model Metrics Dashboard",
+    "timezone": "browser",
+    "panels": [
+      {
+        "title": "QPS (Requests Per Second)",
+        "type": "graph",
+        "datasource": "-- Grafana --",
+	"gridPos": { "x": 0, "y": 0, "w": 12, "h": 6 },
+        "targets": [
+          {
+            "query": "from(bucket: \"llm-metrics\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"statsd_requests_total\" and r._field == \"count\") |> aggregateWindow(every: v.windowPeriod, fn: sum, createEmpty: false) |> yield(name: \"sum\")",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "title": "Request Latency (P95)",
+        "type": "graph",
+        "datasource": "-- Grafana --",
+        "gridPos": { "x": 12, "y": 0, "w": 12, "h": 6 },
+        "targets": [
+          {
+            "query": "from(bucket: \"llm-metrics\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"statsd_request_latency\" and r._field == \"value\") |> quantile(column: \"_value\", quantile: 0.95, method: \"exact_mean\")",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "title": "Output Tokens Per Request",
+        "type": "graph",
+        "datasource": "-- Grafana --",
+        "gridPos": { "x": 0, "y": 6, "w": 12, "h": 6 },
+        "targets": [
+          {
+            "query": "from(bucket: \"llm-metrics\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"statsd_requests_model_qwen2_output_tokens\" and r._field == \"count\") |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false) |> yield(name: \"mean\")",
+            "refId": "A"
+          },
+          {
+            "query": "from(bucket: \"llm-metrics\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"statsd_requests_model_llama3_output_tokens\" and r._field == \"count\") |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false) |> yield(name: \"mean\")",
+            "refId": "B"
+          }
+        ]
+      },
+      {
+        "title": "GPU Utilization",
+        "type": "gauge",
+        "datasource": "-- Grafana --",
+        "gridPos": { "x": 12, "y": 6, "w": 6, "h": 3 },
+        "targets": [
+          {
+            "query": "from(bucket: \"llm-metrics\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"gpu_utilization\" and r._field == \"value\") |> last()",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "title": "GPU Memory Utilization",
+        "type": "gauge",
+        "datasource": "-- Grafana --",
+        "gridPos": { "x": 18, "y": 6, "w": 6, "h": 3 },
+        "targets": [
+          {
+            "query": "from(bucket: \"llm-metrics\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"gpu_memory_util\" and r._field == \"value\") |> last()",
+            "refId": "A"
+          }
+        ]
+      }
+    ],
+    "schemaVersion": 37,
+    "version": 1
+  }
+}

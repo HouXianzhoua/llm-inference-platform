@@ -1,0 +1,25 @@
+mappings:
+  - match: "requests.*"
+    name: "statsd_requests"
+    labels:
+      type: "$1"
+
+  - match: "requests.model.*.input_tokens"
+    name: "statsd_requests_model_${1}_input_tokens"
+
+  - match: "requests.model.*.output_tokens"
+    name: "statsd_requests_model_${1}_output_tokens"
+
+  - match: "request.latency.mean"
+    name: "statsd_request_latency"
+
+  - match: "requests.errors.*"
+    name: "statsd_requests_errors"
+    labels:
+      type: "$1"
+
+  - match: "requests.errors.model.*"
+    name: "statsd_requests_model_${1}_errors"
+  
+
+    

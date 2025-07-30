@@ -1,4 +1,11 @@
 # docker-compose.yml
+
+# 定义共享网络
+networks:
+  app-net:
+    external: true
+    name: app-network  # 固定名称，便于外部引用
+
 services:
   tgi-qwen2:
     image: ghcr.io/huggingface/text-generation-inference:latest
@@ -22,6 +29,8 @@ services:
             - driver: nvidia
               device_ids: ['0']
               capabilities: [gpu]
+    networks:
+      - app-net
 
   tgi-llama3:
     image: ghcr.io/huggingface/text-generation-inference:latest
@@ -44,6 +53,8 @@ services:
             - driver: nvidia
               device_ids: ['0']
               capabilities: [gpu]
+    networks:
+      - app-net
 
   gateway:
     build: 
@@ -51,10 +62,14 @@ services:
       dockerfile: gateway/Dockerfile
     ports:
       - "8000:8000"
-    volumes:
-      - ./gateway:/app/gateway
     depends_on:
       - tgi-qwen2
       - tgi-llama3
+    environment:
+      # 👇 告诉 gateway statsd 的地址
+      - STATSD_HOST=statsd-exporter
+      - STATSD_PORT=9125
+    networks:
+      - app-net    
     # 修改 endpoint 为服务名（docker 内部通信）
     # 注意：config.py 中的 endpoint 要改为服务名！
