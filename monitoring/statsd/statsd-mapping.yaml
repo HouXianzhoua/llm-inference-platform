@@ -10,9 +10,6 @@ mappings:
   - match: "requests.model.*.output_tokens"
     name: "statsd_requests_model_${1}_output_tokens"
 
-  - match: "request.latency.mean"
-    name: "statsd_request_latency"
-
   - match: "requests.errors.*"
     name: "statsd_requests_errors"
     labels:
@@ -21,5 +18,5 @@ mappings:
   - match: "requests.errors.model.*"
     name: "statsd_requests_model_${1}_errors"
   
-
-    
+  - match: "request.latency"
+    name: "statsd_request_latency"
