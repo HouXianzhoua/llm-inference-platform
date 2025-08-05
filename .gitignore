@@ -68,18 +68,27 @@ temp/
 # ========================
 # 🤖 大模型相关（重点！）
 # ========================
-# 忽略所有 models/ 下的内容，除了 MODEL_LIST.md
-/models/*
-!/models/MODEL_LIST.md
+# 忽略 models/ 下的所有子目录（即模型文件夹内容）
+/models/*/
 
-# 额外保险：忽略常见模型文件
-*.safetensors
-*.bin
-*.pt
-*.pth
-*.ckpt
-*.gguf
-*.msgpack
+# 显式忽略 models/ 下的常见大文件类型
+/models/*.safetensors
+/models/*.bin
+/models/*.pt
+/models/*.pth
+/models/*.ckpt
+/models/*.gguf
+/models/*.msgpack
+/models/*.json
+/models/*.txt
+/models/*.xml
+/models/*.model
+/models/*.blob
+
+# ✅ 安全地保留关键文件
+!/models/MODEL_LIST.md
+# 推荐添加一个 README.md 说明 models 目录用途
+# !/models/README.md
 
 # Hugging Face 缓存
 ~/.cache/huggingface/
@@ -94,11 +103,14 @@ models_cache/
 # ========================
 # 📊 监控系统（InfluxDB/Grafana 数据）
 # ========================
-/monitoring/grafana/data/
-/monitoring/grafana/logs/
+# InfluxDB 持久化数据（由容器写入）
 /monitoring/influxdb/
 
-# StatsD 一般只保留配置
+# Grafana 数据和日志
+/monitoring/grafana/data/
+/monitoring/grafana/logs/
+
+# StatsD 数据（通常为空，但保险起见）
 /monitoring/statsd/data/
 /monitoring/statsd/log/
 
