@@ -1,4 +1,3 @@
-```markdown
 # Unified LLM Inference Gateway
 
 基于 **Text Generation Inference (TGI)** 与 **GPTQ 量化技术** 构建的多模型大语言模型推理服务平台，支持 **Qwen2-7B-Instruct** 与 **Meta-Llama-3.1-8B-Instruct** 的热加载、按需切换与统一 API 接入。
