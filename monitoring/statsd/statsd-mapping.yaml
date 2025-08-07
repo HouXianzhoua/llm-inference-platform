@@ -20,4 +20,12 @@ mappings:
 
   - match: "request.latency"
     name: "statsd_request_latency"
+    type: summary
+    labels:
+      source: "gateway"
 
+  - match: "request.latency.raw"
+    name: "request_latency_raw"
+    type: summary
+    labels:
+      metric_type: "latency"

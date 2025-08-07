@@ -188,6 +188,11 @@ async def generate(request: GenerateRequest):
             )
             # 在成功返回时
             stats_client.timing('request.latency', int(latency * 1000))  # 毫秒
+            
+            # 自行采样计算P99
+            logger.info(f"[{request_id}] ✅✅✅ Gauge latency = {int(latency * 1000)}ms")
+            stats_client.timing('request.latency.raw', int(latency * 1000))  # 单位：毫秒
+
             stats_client.incr(f'requests.model.{model_id}.output_tokens', output_tokens)
             return {
                 "generated_text": generated_text,

@@ -14,3 +14,9 @@ datasources:
       defaultBucket: llm-metrics
     secureJsonData:
       token: bkuQoD0occsHQjSMOgh8aEODjpLxde5TSqDw67EXRb5d0G7M6AYOiVBBypj17N4vlJDREG-9YxvQcReCMIlnUw==
+
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: false

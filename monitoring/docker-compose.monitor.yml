@@ -22,16 +22,27 @@ services:
     networks:
       - app-network
 
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    networks:
+      - app-network
+
   statsd-exporter:
     image: prom/statsd-exporter:v0.25.0
     ports:
       - "9125:9125/udp"   # StatsD 接收端口
       - "9102:9102"       # Prometheus 拉取指标端口
     command:
-      - --statsd.mapping-config=/etc/statsd-mapping.conf
+      - --statsd.mapping-config=/etc/statsd-mapping.yaml
       - --log.level=info
     volumes:
-      - ./statsd/statsd-mapping.yaml:/etc/statsd-mapping.conf
+      - ./statsd/statsd-mapping.yaml:/etc/statsd-mapping.yaml
     restart: unless-stopped
     networks:
       - app-network
