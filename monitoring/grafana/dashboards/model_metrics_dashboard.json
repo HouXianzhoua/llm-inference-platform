@@ -76,7 +76,7 @@
               }
             ]
           },
-          "unit": "ms"
+          "unit": "s"
         },
         "overrides": []
       },
@@ -105,11 +105,11 @@
             "type": "influxdb",
             "uid": "influxdb"
           },
-          "query": "from(bucket: \"llm-metrics\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => \r\n      r._measurement == \"statsd_request_latency\" and \r\n      r._field == \"0.99\" // 注意：是字段名 \"0.99\"，不是标签\r\n  )\r\n  // 将秒转换为毫秒\r\n  |> map(fn: (r) => ({ r with _value: r._value * 1000.0 }))\r\n  |> aggregateWindow(every: 30s, fn: mean, createEmpty: false)\r\n  |> yield(name: \"P99 Latency (ms)\")",
+          "query": "from(bucket: \"llm-metrics\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => \r\n      r._measurement == \"statsd_request_latency\" and \r\n      r._field == \"0.99\" // 注意：是字段名 \"0.99\"，不是标签\r\n  )\r\n\r\n  |> aggregateWindow(every: 30s, fn: mean, createEmpty: false)\r\n  |> yield(name: \"P99 Latency\")",
           "refId": "A"
         }
       ],
-      "title": "P99 Latency (ms)",
+      "title": "P99 Latency ",
       "type": "timeseries"
     },
     {
