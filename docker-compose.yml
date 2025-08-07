@@ -73,6 +73,8 @@ services:
       # 👇 告诉 gateway statsd 的地址
       - STATSD_HOST=statsd-exporter
       - STATSD_PORT=9125
+    volumes:
+      - ./models:/app/models
     networks:
       - app-net    
     # 修改 endpoint 为服务名（docker 内部通信）

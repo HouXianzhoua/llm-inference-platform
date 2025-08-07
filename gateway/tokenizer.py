@@ -5,8 +5,8 @@ import os
 
 # 模型路径（根据你项目 models/ 目录调整）
 MODEL_PATHS = {
-    "qwen2": "models/Qwen2-7B-Instruct-GPTQ-Int4",
-    "llama3": "models/Meta-Llama-3.1-8B-Instruct-GPTQ-INT4"
+    "qwen2": "/app/models/Qwen2-7B-Instruct-GPTQ-Int4",
+    "llama3": "/app/models/Meta-Llama-3.1-8B-Instruct-GPTQ-INT4"
 }
 
 # 缓存 tokenizer 实例
