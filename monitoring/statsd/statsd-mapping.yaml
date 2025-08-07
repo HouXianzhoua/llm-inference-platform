@@ -17,6 +17,7 @@ mappings:
 
   - match: "requests.errors.model.*"
     name: "statsd_requests_model_${1}_errors"
-  
+
   - match: "request.latency"
     name: "statsd_request_latency"
+
