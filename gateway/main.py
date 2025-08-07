@@ -11,6 +11,7 @@ import uuid
 import time
 from fastapi import Request
 import json
+from tokenizer import count_tokens
 
 # 初始化 StatsD 客户端（使用 docker-compose 中的 statsd-exporter 服务名）
 stats_client = statsd.StatsClient('statsd-exporter', 9125)  # 注意：在容器内使用服务名
@@ -99,13 +100,15 @@ async def generate(request: GenerateRequest):
     request_id = str(uuid.uuid4())[:8]
     model_id = request.model_id.lower()
     start_time = time.time()
-
     # === 日志：请求开始 ===
-    logger.info(f"[{request_id}] Received | model={model_id} | input_len={len(request.inputs.split())} tokens")
+    input_tokens = count_tokens(model_id, request.inputs)
+    logger.info(f"[{request_id}] Received | model={model_id} | input_tokens={input_tokens}")
+
     # 在请求开始时
     stats_client.incr('requests.total')                    # 总请求数
     stats_client.incr(f'requests.model.{model_id}')       # 按模型统计
-    stats_client.incr(f'requests.model.{model_id}.input_tokens', len(request.inputs.split()))
+    stats_client.incr(f'requests.model.{model_id}.input_tokens', input_tokens)
+
     ts = int(time.time())
     stats_client.incr(f'requests.debug.ts.{ts}')
     if model_id not in MODEL_REGISTRY:
@@ -176,8 +179,8 @@ async def generate(request: GenerateRequest):
             generated_text = result.get("generated_text", "").strip()
 
             latency = time.time() - start_time
-            output_tokens = len(generated_text.split())
-           
+            output_tokens = count_tokens(model_id, generated_text)        
+            
             # === 日志：成功响应 ===
             logger.info(
                 f"[{request_id}] Success | model={model_id} | "
