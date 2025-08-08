@@ -106,7 +106,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "quantile_over_time(0.99, request_latency_raw[2m])",
+          "expr": "histogram_quantile(0.99, sum by (le) (rate(request_latency_seconds_bucket[1m])))",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,

@@ -12,6 +12,7 @@ import time
 from fastapi import Request
 import json
 from tokenizer import count_tokens
+from fastapi.responses import JSONResponse
 
 # 初始化 StatsD 客户端（使用 docker-compose 中的 statsd-exporter 服务名）
 stats_client = statsd.StatsClient('statsd-exporter', 9125)  # 注意：在容器内使用服务名
@@ -194,6 +195,21 @@ async def generate(request: GenerateRequest):
             stats_client.timing('request.latency.raw', int(latency * 1000))  # 单位：毫秒
 
             stats_client.incr(f'requests.model.{model_id}.output_tokens', output_tokens)
+            latency = time.time() - start_time
+
+            response_payload = {
+                "generated_text": generated_text,
+                "model": model_config["name"],
+                "tokens": output_tokens
+            }
+
+            return JSONResponse(
+                content=response_payload,
+                headers={
+                    "X-Request-ID": request_id,
+                    "X-Gateway-Latency": f"{latency:.6f}"  # 秒
+                }
+            )
             return {
                 "generated_text": generated_text,
                 "model": model_config["name"],
